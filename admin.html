@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="./css/admin.css" />
+</head>
+
+<body >
+  <h2>Admin – SOP Management</h2>
+
+  
+
+
+
+
+  <input type="file" id="pdf" /><br /><br />
+
+  <button onclick="upload()">Upload SOP</button>
+  <button onclick="embed()">Generate Embeddings</button>
+
+  <script>
+    async function upload() {
+      const fileInput = document.getElementById("pdf");
+
+      if (!fileInput.files.length) {
+        alert("Please select a PDF file first");
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append("pdf", fileInput.files[0]);
+
+      const res = await fetch("/admin/upload-pdf", {
+        method: "POST",
+        credentials: "include",   // ✅ REQUIRED
+        body: fd
+      });
+
+      const data = await res.json();
+      alert(data.message || data.error);
+    }
+
+    async function embed() {
+      const res = await fetch("/admin/generate-embeddings", {
+        method: "POST",
+        credentials: "include"    // ✅ REQUIRED
+      });
+
+      const data = await res.json();
+      alert(data.message || data.error);
+    }
+  </script>
+
+  <button onclick="logout()">Logout</button>
+  <script>
+async function logout() {
+  await fetch("/auth/logout", {
+    method: "POST",
+    credentials: "include"
+  });
+  window.location.href = "/login.html";
+}
+</script>
+
+</body>
+</html>
