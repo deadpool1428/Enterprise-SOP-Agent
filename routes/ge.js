@@ -1,10 +1,14 @@
 const express = require("express");
 const Chunk = require("../models/chunk");
 const { generateEmbedding } = require("../utils/embedding");
+const { requireAdmin } = require("../middleware/auth");
+
+
+
 
 const router = express.Router();
 
-router.post("/generate-embeddings", async (req, res) => {
+router.post("/generate-embeddings", requireAdmin, async (req, res) => {
   try {
     const chunks = await Chunk.find({
       $or: [
