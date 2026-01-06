@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User – SOP Assistant</title>
+  <link rel="stylesheet" href="./css/user.css" />
+</head>
+
+<body>
+  <div class="container">
+    <button class="logout" onclick="logout()">Logout</button>
+
+    <h2>Enterprise SOP Assistant</h2>
+    <small>Ask questions based on approved SOP documents</small>
+
+    <label for="question">Your Question</label>
+    <input
+      type="text"
+      id="question"
+      placeholder="e.g. What is the notice period for permanent employees?"
+    />
+
+    <button onclick="ask()">Ask</button>
+
+    <label for="answer">Answer</label>
+    <textarea
+      id="answer"
+      rows="8"
+      readonly
+      placeholder="Answer will appear here..."
+    ></textarea>
+
+    <p id="status" class="loading"></p>
+  </div>
+
+  <script>
+    async function ask() {
+      const question = document.getElementById("question").value;
+      const answerBox = document.getElementById("answer");
+      const status = document.getElementById("status");
+
+      if (!question) {
+        alert("Please enter a question");
+        return;
+      }
+
+      answerBox.value = "";
+      status.textContent = "Querying SOP… please wait";
+
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ question })
+        });
+
+        const data = await res.json();
+        answerBox.value = data.answer || "No answer received";
+        status.textContent = "";
+
+      } catch (err) {
+        answerBox.value = "Error contacting server";
+        status.textContent = "";
+      }
+    }
+
+    async function logout() {
+      await fetch("/auth/logout", {
+        method: "POST",
+        credentials: "include"
+      });
+      window.location.href = "/login.html";
+    }
+  </script>
+</body>
+</html>
